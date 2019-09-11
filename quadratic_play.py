@@ -3,11 +3,15 @@ import pyglet
 from pyglet.gl import *
 from pyglet.window import mouse, key
 from bez import *
+import sys
 
 window = pyglet.window.Window( 1000, 1000 )
 p1, p2, p3 = ( 100, 100 ), ( 100, 500 ), ( 600, 500 )
 pts = [ p1, p2, p3 ]
 selected = 1
+res = 10
+if len( sys.argv ) > 1:
+    res = int( sys.argv[1] )
 
 @window.event
 def on_mouse_drag( x, y, dx, dy, buttons, modifiers ):
@@ -35,7 +39,7 @@ def on_draw():
     glBegin( GL_LINE_STRIP )
 
     glColor3f( 1.0, 0.0, 0.0 )
-    for pt in multi_quad_bez( pts, 10 ):
+    for pt in multi_quad_bez( pts, res ):
         glVertex2f( *pt )
     glEnd()
 
