@@ -1,3 +1,4 @@
+import numpy as np
 
 def multi_quad_bez( ctrl_pts, res ):
     if len( ctrl_pts ) % 2 == 0:
@@ -87,10 +88,6 @@ class Smooth_Quad_Curve():
             self.points.append( (x, y) )
             return
         
-        # get dist between second to last point and last
-        # get linear eqn
-        # figure out direction
-
         ctrl_pt = x1, y1 = self.points[ -2 ]
         thru_pt = x2, y2 = self.points[ -1 ]
 
@@ -108,16 +105,87 @@ class Smooth_Quad_Curve():
     def get_points( self ):
         return list( [x for x in self.points ] )
 
+def mirror_pt( pt1, center ):
+    eqn = lin_eqn( *pt1, *center )
+    x = 2 * center[0] - pt1[0]
+    y = eqn( x )
+    return ( x, y )
 
+def handles( x, y, dist ):
+    h1x, h1y = (( x - dist ), y)
+    h2x, h2y = mirror_pt( ( h1x, h1y ), ( x, y ) )
+    return [ h1x, h1y, h2x, h2y ]
 
+def rotate_pt_clock( pt, center, theta ):
+    theta = np.radians( theta )
+    np_pt = np.array( pt )
+    np_center = np.array( center )
 
+    np_pt = np_pt - np_center
+    c, s = np.cos( theta ), np.sin( theta )
+    R = np.array( ( ( c, s ), ( -s, c ) ) )
+    fpt = ( R @ np_pt ) + np_center
+    if type( pt ) is type( () ):
+        return ( fpt[0], fpt[1] )
+    else:
+        return [ fpt[0], fpt[1] ]
 
+class Smooth_Cubic_Curve():
+    def __init__( self ):
+        # [ c1x, c1y, ax, xy, c2x, c2y ]
+        self.points = []
 
+    def add_point( self, x, y ):
+        hdls = handles( x, y, 30 )
+        self.points.append( hdls[ 0:2 ] + [ x, y ] + hdls[ 2:4 ] )
 
+    def _points_tupled( self ):
+        tuppts = []
+        for cac in self.points:
+            tuppts += [ ( cac[0], cac[1] ), ( cac[2], cac[3] ), ( cac[4], cac[5] ) ]
+        return tuppts
 
+    def get_vertices( self, res ):
+        all_pts = self._points_tupled()
+        all_pts = all_pts[1:-1]
+        return multi_cube_bez( all_pts, res )
 
+    def get_points( self ):
+        return self._points_tupled()
 
+    def nodes( self ):
+        return list( [x for x in self.points ] )
 
+    def transform_node( self, node, part, rotation=None, extend=None, translation=None, moveTo=None ):
+        nd = self.points[ node ]
+        
+        if translation is not None and moveTo is not None:
+            raise Exception( "Cannot translate and moveTo" )
 
-    
+        # handle moveTo
+        if moveTo is not None:
+            dx = moveTo[0] - nd[ part * 2 ]
+            dy = moveTo[1] - nd[ part * 2 + 1 ]
+            translation = ( dx, dy ) 
+        
+        # handle translate
+        if translation is not None:
+            if part == 1:
+                for i in range( 3 ):
+                    nd[ i * 2 ] += translation[0]
+                    nd[ i * 2 + 1 ] += translation[1]
+            else:
+                nd[ part * 2 ] += translation[0]
+                nd[ part * 2 + 1 ] += translation[1]
+                otherx, othery = mirror_pt( ( nd[ part * 2 ], nd[ part * 2 + 1] ), ( nd[2], nd[3] ) )
+                if part == 0:
+                    nd[ 4 ] = otherx
+                    nd[ 5 ] = othery
+                else:
+                    nd[ 0 ] = otherx
+                    nd[ 1 ] = othery
 
+        # TODO
+        # handle rotation
+        # handle extend
+                
