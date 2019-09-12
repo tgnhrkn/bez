@@ -99,6 +99,7 @@ class Smooth_Quad_Curve():
         self.points.append( ( new_ctl_x, new_ctl_y ) )
         self.points.append( ( x, y ) )
 
+
     def get_vertices( self, res ):
         return multi_quad_bez( self.points, res )
 
@@ -106,10 +107,15 @@ class Smooth_Quad_Curve():
         return list( [x for x in self.points ] )
 
 def mirror_pt( pt1, center ):
-    eqn = lin_eqn( *pt1, *center )
-    x = 2 * center[0] - pt1[0]
-    y = eqn( x )
-    return ( x, y )
+    if pt1[0] == center[0]:
+        x = pt1[0]
+        y = 2 * center[1] - pt1[1]
+        return (x, y)
+    else:
+        eqn = lin_eqn( *pt1, *center )
+        x = 2 * center[0] - pt1[0]
+        y = eqn( x )
+        return ( x, y )
 
 def handles( x, y, dist ):
     h1x, h1y = (( x - dist ), y)
@@ -138,6 +144,15 @@ class Smooth_Cubic_Curve():
     def add_point( self, x, y ):
         hdls = handles( x, y, 30 )
         self.points.append( hdls[ 0:2 ] + [ x, y ] + hdls[ 2:4 ] )
+
+    def del_point( self, idx=-1 ):
+        if idx < -1:
+            return
+
+        if len( self.points ) == 0 or idx >= len( self.points ):
+            return
+
+        del self.points[ idx ]
 
     def _points_tupled( self ):
         tuppts = []
