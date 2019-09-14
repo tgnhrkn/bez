@@ -204,3 +204,21 @@ class Smooth_Cubic_Curve():
         # handle rotation
         # handle extend
                 
+class Smooth_Cubic_Polybezier( Smooth_Cubic_Curve ):
+    
+    def get_vertices( self, res ):
+        if len( self.points ) == 0:
+            return []
+        all_pts = self._points_tupled()
+        all_pts_trimmed = list( all_pts[1:] )
+        all_pts_trimmed.append( all_pts[0] )
+        all_pts_trimmed.append( all_pts[1] )
+        return multi_cube_bez( all_pts_trimmed, res )
+
+
+
+
+
+
+
+    
