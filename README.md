@@ -8,4 +8,6 @@ a: add mode - add nodes to the curve
 
 s: settings - turn on/off graphics
 
-i: interactive mode - left click to select, right click to drag the selected point
+i: interactive mode - left click to select, right click to drag the selected point, d to delete point
+
+Backspace: remove last placed point
