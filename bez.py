@@ -1,4 +1,5 @@
 import numpy as np
+from util import *
 
 def multi_quad_bez( ctrl_pts, res ):
     if len( ctrl_pts ) % 2 == 0:
@@ -62,16 +63,6 @@ def cube_bez( p0, p1, p2, p3, res ):
     return list( zip( cube_x, cube_y ) )
 
 
-def lin_eqn( x1, y1, x2, y2 ):
-    m = ( y2 - y1 ) / ( x2 - x1 )
-    b = y1 - ( m * x1 )
-    return lambda x: m * x + b
-
-def get_mid( pt1, pt2 ):
-    x = ( pt1[0] + pt2[0] ) / 2
-    y = ( pt1[1] + pt2[1] ) / 2
-    return ( x, y )
-
 class Smooth_Quad_Curve():
     
     def __init__( self ):
@@ -106,35 +97,10 @@ class Smooth_Quad_Curve():
     def get_points( self ):
         return list( [x for x in self.points ] )
 
-def mirror_pt( pt1, center ):
-    if pt1[0] == center[0]:
-        x = pt1[0]
-        y = 2 * center[1] - pt1[1]
-        return (x, y)
-    else:
-        eqn = lin_eqn( *pt1, *center )
-        x = 2 * center[0] - pt1[0]
-        y = eqn( x )
-        return ( x, y )
-
 def handles( x, y, dist ):
     h1x, h1y = (( x - dist ), y)
     h2x, h2y = mirror_pt( ( h1x, h1y ), ( x, y ) )
     return [ h1x, h1y, h2x, h2y ]
-
-def rotate_pt_clock( pt, center, theta ):
-    theta = np.radians( theta )
-    np_pt = np.array( pt )
-    np_center = np.array( center )
-
-    np_pt = np_pt - np_center
-    c, s = np.cos( theta ), np.sin( theta )
-    R = np.array( ( ( c, s ), ( -s, c ) ) )
-    fpt = ( R @ np_pt ) + np_center
-    if type( pt ) is type( () ):
-        return ( fpt[0], fpt[1] )
-    else:
-        return [ fpt[0], fpt[1] ]
 
 class Smooth_Cubic_Curve():
     def __init__( self ):

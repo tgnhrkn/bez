@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 from bez import *
+from util import *
 import numpy as np
 
 def test_lin_eqn():
@@ -16,6 +17,25 @@ def test_clock_rot():
 
     res = rotate_pt_clock( pt, center, theta )
     print( res )
-    
-test_clock_rot()
 
+def test_lerp():
+    s = 10
+    e = 20
+    n = 3
+    res = lerp( s, e, n )
+    print( res )
+
+def test_lerp_pts():
+    s = ( 10, 10 )
+    end = ( 20, 50 )
+    n = 3
+    res = lerp_pts( s, end, n )
+    print( res )
+
+def test_ang_bet():
+    s = ( 0,2 )
+    e = ( 2,-1 )
+    res = angle_between( s, e, ( 1, 1 ) )
+    print( res )
+    
+test_ang_bet()
